@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number to Word Converter</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: #f5f5f5; 
+            flex-direction: column;
+        }
+        .container { 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            max-width: 600px; 
+            width: 100%; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        }
+        .input-container { 
+            display: flex; 
+            align-items: center; 
+        }
+        input { 
+            font-size: 16px; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            width: calc(100% - 100px); 
+            margin-right: 5px; 
+        }
+        button { 
+            font-size: 16px; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 4px; 
+            background: #007bff; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        button.clear { 
+            background: #dc3545; 
+        }
+        button:hover { 
+            background: #0056b3; 
+        }
+        button.clear:hover { 
+            background: #c82333; 
+        }
+        table { 
+            margin-top: 20px; 
+            width: 100%; 
+            border-collapse: collapse; 
+            display: none; 
+        }
+        th, td { 
+            padding: 10px; 
+            text-align: center; 
+            border: 1px solid #ddd; 
+            cursor: pointer; 
+        }
+        th { 
+            background: #f2f2f2; 
+        }
+        .notification { 
+            display: none; 
+            color: green; 
+            text-align: center; 
+            margin-top: 10px; 
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number to Word Converter</h1>
+        <div class="input-container">
+            <input type="number" id="numberInput" placeholder="Enter number" oninput="convertNumber()" />
+            <button class="clear" onclick="clearInput()">Clear</button>
+        </div>
+        <div class="notification" id="notification">Copied!</div>
+        <table id="resultTable">
+            <thead>
+                <tr>
+                    <th onclick="copy('hindi')">हिन्दी</th>
+                    <th onclick="copy('english')">English</th>
+                    <th onclick="copy('usEnglish')">US English</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody">
+                <tr><td colspan="3">Enter a number</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        Powered by <a href="#">Falendra Sahu ❤️</a>
+    </footer>
+
+    <script>
+        function convertNumber() {
+            const number = parseInt(document.getElementById('numberInput').value, 10);
+            const resultBody = document.getElementById('resultBody');
+            if (isNaN(number) || number < 0) {
+                resultBody.innerHTML = '<tr><td colspan="3">Enter a number</td></tr>';
+                document.getElementById('resultTable').style.display = 'none';
+                return;
+            }
+            const words = [convertToHindiWords(number), convertToEnglishWords(number), convertToUsEnglishWords(number)];
+            resultBody.innerHTML = `<tr>
+                <td onclick="copy('hindi', '${words[0]}', ${number})">${words[0]}</td>
+                <td onclick="copy('english', '${words[1]}', ${number})">${words[1]}</td>
+                <td onclick="copy('usEnglish', '${words[2]}', ${number})">${words[2]}</td>
+            </tr>`;
+            document.getElementById('resultTable').style.display = 'table';
+        }
+
+        function clearInput() {
+            document.getElementById('numberInput').value = '';
+            document.getElementById('resultBody').innerHTML = '<tr><td colspan="3">Enter a number</td></tr>';
+            document.getElementById('resultTable').style.display = 'none';
+        }
+
+        function copy(type, word = '', number = 0) {
+            const text = `${word} (${number})`;
+            navigator.clipboard.writeText(text).then(showNotification).catch(console.error);
+        }
+
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.style.display = 'block';
+            setTimeout(() => { notification.style.display = 'none'; }, 1000);
+        }
+
+        // Conversion functions
+        function convertToHindiWords(n) {
+            if (n === 0) return 'शून्य';
+            const units = ['', 'एक', 'दो', 'तीन', 'चार', 'पाँच', 'छह', 'सात', 'आठ', 'नौ'];
+            const teens = ['ग्यारह', 'बारह', 'तेरह', 'चौदह', 'पंद्रह', 'सोलह', 'सत्रह', 'अठारह', 'उन्नीस'];
+            const tens = ['', 'दस', 'बीस', 'तीस', 'चालीस', 'पचास', 'साठ', 'सत्तर', 'अस्सी', 'नब्बे'];
+            const specialTens = { 21: 'इक्कीस', 22: 'बाईस', 23: 'तेईस', 24: 'चौबीस', 25: 'पच्चीस', 26: 'छब्बीस', 27: 'सत्ताईस', 28: 'अठ्ठाईस', 29: 'उनतीस', 31: 'इकतीस', 32: 'बत्तीस', 33: 'तैंतीस', 34: 'चौतीस', 35: 'पैंतीस', 36: 'छत्तीस', 37: 'सैंतीस', 38: 'अड़तीस', 39: 'उनतालीस', 41: 'इकतालीस', 42: 'बयालीस', 43: 'तैंतालीस', 44: 'चौवालीस', 45: 'पैंतालीस', 46: 'छियालिस', 47: 'सैंतालीस', 48: 'अड़तालीस', 49: 'उनचास', 51: 'इक्यावन', 52: 'बावन', 53: 'तिरपन', 54: 'चौवन', 55: 'पचपन', 56: 'छप्पन', 57: 'सत्तावन', 58: 'अठ्ठावन', 59: 'उनसठ', 61: 'इकसठ', 62: 'बासठ', 63: 'तिरसठ', 64: 'चौंसठ', 65: 'पैंसठ', 66: 'छियासठ', 67: 'सड़सठ', 68: 'अठसठ', 69: 'उनहत्तर', 71: 'इकहत्तर', 72: 'बहत्तर', 73: 'तिहत्तर', 74: 'चौहत्तर', 75: 'पचहत्तर', 76: 'छिहत्तर', 77: 'सत्तहत्तर', 78: 'अठहत्तर', 79: 'उनासी', 81: 'इक्यासी', 82: 'बयासी', 83: 'तिरासी', 84: 'चौरासी', 85: 'पचासी', 86: 'छियासी', 87: 'सत्तासी', 88: 'अट्ठासी', 89: 'नवासी', 91: 'इक्यानबे', 92: 'बानबे', 93: 'तिरानबे', 94: 'चौरानबे', 95: 'पंचानबे', 96: 'छियानबे', 97: 'सत्तानबे', 98: 'अट्ठानबे', 99: 'निन्यानबे' };
+            const numToWords = (n) => n < 10 ? units[n] : n >= 11 && n < 20 ? teens[n - 11] : specialTens[n] || n < 100 ? `${tens[Math.floor(n / 10)]}${n % 10 ? ' ' + units[n % 10] : ''}` : n < 1000 ? `${units[Math.floor(n / 100)]} सौ${n % 100 ? ' ' + numToWords(n % 100) : ''}` : n < 100000 ? `${numToWords(Math.floor(n / 1000))} हजार${n % 1000 ? ' ' + numToWords(n % 1000) : ''}` : n < 10000000 ? `${numToWords(Math.floor(n / 100000))} लाख${n % 100000 ? ' ' + numToWords(n % 100000) : ''}` : n < 1000000000 ? `${numToWords(Math.floor(n / 10000000))} करोड़${n % 10000000 ? ' ' + numToWords(n % 10000000) : ''}` : '';
+            return numToWords(n).trim();
+        }
+
+        function convertToEnglishWords(n) {
+            if (n === 0) return 'Zero';
+            const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const numToWords = (n) => n < 10 ? units[n] : n >= 11 && n < 20 ? teens[n - 11] : n < 100 ? `${tens[Math.floor(n / 10)]}${n % 10 ? '-' + units[n % 10] : ''}` : n < 1000 ? `${units[Math.floor(n / 100)]} hundred${n % 100 ? ' and ' + numToWords(n % 100) : ''}` : n < 100000 ? `${numToWords(Math.floor(n / 1000))} thousand${n % 1000 ? ' ' + numToWords(n % 1000) : ''}` : n === 100000 ? 'One lakh' : n < 10000000 ? `${numToWords(Math.floor(n / 100000))} lakh${n % 100000 ? ' ' + numToWords(n % 100000) : ''}` : n < 1000000000 ? `${numToWords(Math.floor(n / 10000000))} crore${n % 10000000 ? ' ' + numToWords(n % 10000000) : ''}` : '';
+            return numToWords(n).trim();
+        }
+
+        function convertToUsEnglishWords(n) {
+            if (n === 0) return 'Zero';
+            const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+            const teens = ['Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+            const tens = ['', 'Ten', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+            const numToWords = (n) => n < 10 ? units[n] : n >= 11 && n < 20 ? teens[n - 11] : n < 100 ? `${tens[Math.floor(n / 10)]}${n % 10 ? '-' + units[n % 10] : ''}` : n < 1000 ? `${units[Math.floor(n / 100)]} hundred${n % 100 ? ' and ' + numToWords(n % 100) : ''}` : n < 1000000 ? `${numToWords(Math.floor(n / 1000))} thousand${n % 1000 ? ' ' + numToWords(n % 1000) : ''}` : n < 1000000000 ? `${numToWords(Math.floor(n / 1000000))} million${n % 1000000 ? ' ' + numToWords(n % 1000000) : ''}` : '';
+            return numToWords(n).trim();
+        }
+    </script>
+</body>
+</html>
